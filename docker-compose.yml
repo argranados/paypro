@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  paypro-app:
+    build: .
+    container_name: paypro-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://paypro-db:5432/paypro
+      SPRING_DATASOURCE_USERNAME: paypro
+      SPRING_DATASOURCE_PASSWORD: paypro123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      PAYPRO_API_KEY: secret123
+    depends_on:
+      - paypro-db
+
+  paypro-db:
+    image: postgres:15
+    container_name: paypro-db
+    environment:
+      POSTGRES_DB: paypro
+      POSTGRES_USER: paypro
+      POSTGRES_PASSWORD: paypro123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
