@@ -23,6 +23,13 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         // TODO Auto-generated method stub
         String headerKey = request.getHeader("X-API-KEY");
+        String path = request.getRequestURI();
+
+        // Excluir Actuator endpoints
+        if (path.startsWith("/actuator")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (headerKey == null || !headerKey.equals(apiKey)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
