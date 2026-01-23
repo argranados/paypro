@@ -7,10 +7,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.ciberaccion.paypro.dto.PaymentRequest;
 import com.ciberaccion.paypro.model.Payment;
 import com.ciberaccion.paypro.service.PaymentService;
 
+import jakarta.validation.Valid;
+
+@RestController
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -20,8 +25,8 @@ public class PaymentController {
     }
 
     @PostMapping("/payments")
-    public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {
-        return ResponseEntity.ok(paymentService.create(payment));
+    public ResponseEntity<Payment> createPayment(@Valid @RequestBody PaymentRequest request) {
+        return ResponseEntity.ok(paymentService.create(request));
     }
 
     @GetMapping("/payments/{id}")

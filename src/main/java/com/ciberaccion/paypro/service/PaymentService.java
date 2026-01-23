@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.ciberaccion.paypro.dto.PaymentRequest;
 import com.ciberaccion.paypro.model.Payment;
 import com.ciberaccion.paypro.repository.PaymentRepository;
 
@@ -18,7 +19,11 @@ public class PaymentService {
     }
 
     // Crear un nuevo pago
-    public Payment create(Payment payment) {
+    public Payment create(PaymentRequest request) {
+        Payment payment = new Payment();
+    payment.setMerchant(request.getMerchant());
+    payment.setAmount(request.getAmount());
+    payment.setCurrency(request.getCurrency());
         payment.setStatus("PENDING"); // estado inicial
         payment.setCreatedAt(LocalDateTime.now());
         return paymentRepository.save(payment);
