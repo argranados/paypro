@@ -19,7 +19,7 @@ services:
     image: postgres:15
     container_name: paypro-db
     environment:
-      POSTGRES_DB: paypro
+      POSTGRES_DB: paypro_db
       POSTGRES_USER: paypro
       POSTGRES_PASSWORD: paypro123
     ports:

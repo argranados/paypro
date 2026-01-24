@@ -39,3 +39,10 @@ jobs:
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ciberaccion/paypro:latest
           docker tag paypro:latest $IMAGE_URI
           docker push $IMAGE_URI
+
+      - name: Force ECS redeploy
+        run: |
+          aws ecs update-service \
+            --cluster paypro-cluster \
+            --service paypro-task2301-service-dy51lg1k \
+            --force-new-deployment
