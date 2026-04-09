@@ -24,3 +24,9 @@ Nota sobre SecurityConfig
 El FilterRegistrationBean está comentado — eso hubiera sido una forma manual de registrar el filtro solo en /payments/*. Como está comentado, aplica a todos los endpoints (excepto /actuator que tiene su propia excepción en el filtro).
 
 En resumen: @Component es suficiente para que Spring Boot lo inyecte automáticamente en cada request.
+
+ECS Cluster Error:
+Ese error es porque falta el service linked role de ECS en tu cuenta nueva. Es un role que AWS necesita crear una sola vez por cuenta.
+La forma más rápida de crearlo es desde CloudShell (la terminal de AWS, es gratuita):
+Haz clic en el ícono de terminal >_ en la barra superior de la consola AWS
+Ejecuta este comando: bashaws iam create-service-linked-role --aws-service-name ecs.amazonaws.com
