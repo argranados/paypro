@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ciberaccion.paypro.dto.PaymentRequest;
+import com.ciberaccion.paypro.dto.PaymentResponse;
 import com.ciberaccion.paypro.model.Payment;
 import com.ciberaccion.paypro.service.PaymentService;
 
@@ -32,12 +33,12 @@ public class PaymentController {
     }
 
     @GetMapping("/payments/{id}")
-    public ResponseEntity<Payment> getPayment(@PathVariable Long id) {
+    public ResponseEntity<PaymentResponse> getPayment(@PathVariable Long id) {
         return ResponseEntity.ok(paymentService.findById(id));
     }
 
     @GetMapping("/payments")
-    public ResponseEntity<List<Payment>> getAllPayments() {
+    public ResponseEntity<List<PaymentResponse>> getAllPayments() {
         return ResponseEntity.ok(paymentService.findAll());
     }
 

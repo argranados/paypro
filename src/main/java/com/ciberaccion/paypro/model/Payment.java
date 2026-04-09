@@ -1,8 +1,11 @@
 package com.ciberaccion.paypro.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,9 +24,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String merchant;
-    private Double amount;
+    private BigDecimal amount;
     private String currency;
-    private String status; // PENDING, SUCCESS, FAILED
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status; // PENDING, SUCCESS, FAILED
     private LocalDateTime createdAt;
 }
 
