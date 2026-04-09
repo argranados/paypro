@@ -53,5 +53,5 @@ jobs:
           aws ecs update-service \
             --cluster paypro-cluster \
             --service paypro-service \
-            --force-new-deployment
+            --force-new-deployment \
             --region ${{ secrets.AWS_REGION }}
