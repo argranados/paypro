@@ -256,7 +256,11 @@ Ejecuta este comando: bashaws iam create-service-linked-role --aws-service-name 
 
 9-Abril
 # apagar
- 
+aws ecs update-service \
+  --cluster paypro-cluster \
+  --service paypro-service \
+  --desired-count 0 \
+  --region us-east-1
 
 # encender
 aws ecs update-service \

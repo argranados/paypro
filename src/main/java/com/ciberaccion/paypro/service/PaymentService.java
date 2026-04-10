@@ -4,10 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import com.ciberaccion.paypro.controller.exception.PaymentNotFoundException;
+import com.ciberaccion.paypro.dto.DebitRequest;
 import com.ciberaccion.paypro.dto.PaymentRequest;
 import com.ciberaccion.paypro.dto.PaymentResponse;
+import com.ciberaccion.paypro.exception.PaymentNotFoundException;
 import com.ciberaccion.paypro.model.Payment;
 import com.ciberaccion.paypro.model.PaymentStatus;
 import com.ciberaccion.paypro.repository.PaymentRepository;
@@ -16,38 +19,50 @@ import com.ciberaccion.paypro.repository.PaymentRepository;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final WebClient accountWebClient;
 
-    public PaymentService(PaymentRepository paymentRepository) {
+    public PaymentService(PaymentRepository paymentRepository, WebClient accountWebClient) {
         this.paymentRepository = paymentRepository;
+        this.accountWebClient = accountWebClient;
     }
 
-    // Crear un nuevo pago
-    public Payment create(PaymentRequest request) {
+    public PaymentResponse create(PaymentRequest request) {
         Payment payment = new Payment();
         payment.setMerchant(request.getMerchant());
         payment.setAmount(request.getAmount());
         payment.setCurrency(request.getCurrency());
-        payment.setStatus(PaymentStatus.PENDING); // estado inicial
         payment.setCreatedAt(LocalDateTime.now());
-        return paymentRepository.save(payment);
+
+        try {
+            accountWebClient.post()
+                    .uri("/accounts/{merchantId}/debit", request.getMerchant())
+                    .bodyValue(new DebitRequest(request.getAmount()))
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+
+            payment.setStatus(PaymentStatus.APPROVED);
+
+        } catch (WebClientResponseException e) {
+            payment.setStatus(PaymentStatus.REJECTED);
+        }
+
+        return toResponse(paymentRepository.save(payment));
     }
 
-    // Buscar pago por ID
     public PaymentResponse findById(Long id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new PaymentNotFoundException(id));
         return toResponse(payment);
     }
 
-    // Obtener todos los pagos
     public List<PaymentResponse> findAll() {
         return paymentRepository.findAll()
-            .stream()
-            .map(this::toResponse)
-            .toList();
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    // método privado de conversión
     private PaymentResponse toResponse(Payment payment) {
         return new PaymentResponse(
                 payment.getId(),
@@ -55,7 +70,7 @@ public class PaymentService {
                 payment.getAmount(),
                 payment.getCurrency(),
                 payment.getStatus(),
-                payment.getCreatedAt());
+                payment.getCreatedAt()
+        );
     }
-
 }
