@@ -8,7 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.ciberaccion.paypro.controller.exception.PaymentNotFoundException;
+import com.ciberaccion.paypro.exception.PaymentNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
