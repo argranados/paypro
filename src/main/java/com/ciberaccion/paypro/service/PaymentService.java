@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.ciberaccion.paypro.dto.CardValidationRequest;
 import com.ciberaccion.paypro.dto.DebitRequest;
+import com.ciberaccion.paypro.dto.PaymentEvent;
 import com.ciberaccion.paypro.dto.PaymentRequest;
 import com.ciberaccion.paypro.dto.PaymentResponse;
 import com.ciberaccion.paypro.exception.PaymentNotFoundException;
@@ -22,13 +23,16 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final WebClient accountWebClient;
     private final WebClient providerWebClient;
+    private final NotificationPublisher notificationPublisher;
 
     public PaymentService(PaymentRepository paymentRepository,
             WebClient accountWebClient,
-            WebClient providerWebClient) {
+            WebClient providerWebClient,
+            NotificationPublisher notificationPublisher) {
         this.paymentRepository = paymentRepository;
         this.accountWebClient = accountWebClient;
         this.providerWebClient = providerWebClient;
+        this.notificationPublisher = notificationPublisher;
     }
 
     public PaymentResponse create(PaymentRequest request) {
@@ -78,7 +82,18 @@ public class PaymentService {
             payment.setStatus(PaymentStatus.REJECTED);
         }
 
-        return toResponse(paymentRepository.save(payment));
+        Payment saved = paymentRepository.save(payment);
+        notificationPublisher.publish(toEvent(saved));
+        return toResponse(saved);
+    }
+
+    private PaymentEvent toEvent(Payment payment) {
+        return new PaymentEvent(
+                payment.getId(),
+                payment.getMerchant(),
+                payment.getAmount(),
+                payment.getCurrency(),
+                payment.getStatus().name());
     }
 
     public PaymentResponse findById(Long id) {
